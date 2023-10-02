@@ -13,11 +13,16 @@ func main() {
 		port = "8080"
 	}
 
+	message, ok := os.LookupEnv("MESSAGE")
+	if !ok {
+		message = "Hello World!"
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		w.Write([]byte("Hello World"))
+		_, _ = w.Write([]byte(message))
 	})
 
-	http.ListenAndServe(fmt.Sprintf(":%s", port), mux)
+	_ = http.ListenAndServe(fmt.Sprintf(":%s", port), mux)
 }
