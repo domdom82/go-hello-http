@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 )
 
 func main() {
+
+	ip := getEgressIP()
 
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
@@ -15,7 +18,7 @@ func main() {
 
 	message, ok := os.LookupEnv("MESSAGE")
 	if !ok {
-		message = "Hello World!"
+		message = fmt.Sprintf("Hello World! from: %s\n", ip)
 	}
 
 	mux := http.NewServeMux()
@@ -25,4 +28,11 @@ func main() {
 	})
 
 	_ = http.ListenAndServe(fmt.Sprintf(":%s", port), mux)
+}
+
+func getEgressIP() string {
+	conn, _ := net.Dial("udp", "1.2.3.4:123")
+	defer conn.Close()
+
+	return conn.LocalAddr().(*net.UDPAddr).IP.String()
 }
