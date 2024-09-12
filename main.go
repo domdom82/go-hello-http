@@ -9,7 +9,8 @@ import (
 
 func main() {
 
-	ip := getEgressIP()
+	ip4 := getEgressv4IP()
+	ip6 := getEgressv6IP()
 
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
@@ -18,7 +19,7 @@ func main() {
 
 	message, ok := os.LookupEnv("MESSAGE")
 	if !ok {
-		message = fmt.Sprintf("Hello World! from: %s\n", ip)
+		message = fmt.Sprintf("Hello World!\nfrom:\n%s (v4)\n%s (v6)\n", ip4, ip6)
 	}
 
 	mux := http.NewServeMux()
@@ -30,8 +31,15 @@ func main() {
 	_ = http.ListenAndServe(fmt.Sprintf(":%s", port), mux)
 }
 
-func getEgressIP() string {
+func getEgressv4IP() string {
 	conn, _ := net.Dial("udp", "1.2.3.4:123")
+	defer conn.Close()
+
+	return conn.LocalAddr().(*net.UDPAddr).IP.String()
+}
+
+func getEgressv6IP() string {
+	conn, _ := net.Dial("udp6", "[1:2:3:4:5:6:7:8]:123")
 	defer conn.Close()
 
 	return conn.LocalAddr().(*net.UDPAddr).IP.String()
