@@ -32,14 +32,20 @@ func main() {
 }
 
 func getEgressv4IP() string {
-	conn, _ := net.Dial("udp", "1.2.3.4:123")
+	conn, err := net.Dial("udp", "1.2.3.4:123")
+	if err != nil {
+		return err.Error()
+	}
 	defer conn.Close()
 
 	return conn.LocalAddr().(*net.UDPAddr).IP.String()
 }
 
 func getEgressv6IP() string {
-	conn, _ := net.Dial("udp6", "[1:2:3:4:5:6:7:8]:123")
+	conn, err := net.Dial("udp6", "[1:2:3:4:5:6:7:8]:123")
+	if err != nil {
+		return err.Error()
+	}
 	defer conn.Close()
 
 	return conn.LocalAddr().(*net.UDPAddr).IP.String()
